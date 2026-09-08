@@ -1,7 +1,4 @@
-import { Field }  from './components/Field';
-import { SectionLabel } from './components/SectionLabel';
-
-// ─── placeholder data ─────────────────────────────────────────────────────────
+import { Field } from './components/Field';
 
 const KEPLERIAN = {
   a:     '6 786',
@@ -23,110 +20,91 @@ const CARTESIAN = {
   v:  '7.656',
 };
 
-// ─── panel header ─────────────────────────────────────────────────────────────
-
-function PanelHeader({
-  dot,
-  title,
-  badge,
-}: {
-  dot: 'blue' | 'green';
-  title: string;
-  badge: string;
-}) {
+function PanelHeader({ dot, title, badge }: { dot: 'blue' | 'green'; title: string; badge: string }) {
   return (
-    <div className="flex items-center justify-between mb-6">
+    <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-2">
-        <span
-          className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-            dot === 'blue' ? 'bg-blue-500' : 'bg-emerald-500'
-          }`}
-        />
-        <span className="text-[11px] font-semibold tracking-[0.12em] text-slate-700 uppercase">
-          {title}
-        </span>
+        <span className={`w-2 h-2 rounded-full shrink-0 ${dot === 'blue' ? 'bg-blue-500' : 'bg-emerald-500'}`} />
+        <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-600 uppercase">{title}</span>
       </div>
-      <span className="text-sm text-slate-400">{badge}</span>
+      <span className="text-xs text-slate-400">{badge}</span>
     </div>
   );
 }
 
-// ─── app ─────────────────────────────────────────────────────────────────────
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2 mt-3 mb-1">
+      <span className="text-[9px] font-semibold tracking-[0.14em] text-slate-400 uppercase whitespace-nowrap">{label}</span>
+      <div className="flex-1 h-px bg-slate-100" />
+    </div>
+  );
+}
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="h-screen bg-white flex flex-col overflow-hidden">
 
-      {/* top bar */}
-      <header className="flex items-center justify-between px-10 py-5 bg-white border-b border-slate-100">
-        <div className="flex items-center gap-3">
-          <h1 className="text-lg font-semibold text-slate-800 tracking-tight">
-            Orbital element converter
-          </h1>
-          <span className="text-sm text-blue-500 border border-blue-200 bg-blue-50 rounded-full px-3 py-0.5">
+      {/* header */}
+      <header className="flex items-center justify-between px-8 py-3 border-b border-slate-100 shrink-0">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-sm font-semibold text-slate-800 tracking-tight">Orbital element converter</h1>
+          <span className="text-xs text-blue-500 border border-blue-200 bg-blue-50 rounded-full px-2.5 py-0.5">
             Keplerian ↔ Cartesian
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <button className="
-            flex items-center gap-1.5 text-sm text-slate-600
-            border border-slate-200 rounded-lg px-3.5 py-1.5
-            hover:bg-slate-50 transition-colors
-          ">
+          <button className="text-xs text-slate-500 border border-slate-200 rounded-md px-3 py-1.5 hover:bg-slate-50 transition-colors">
             ↺ Reset
           </button>
-          <button className="
-            flex items-center gap-1.5 text-sm text-slate-600
-            border border-slate-200 rounded-lg px-3.5 py-1.5
-            hover:bg-slate-50 transition-colors
-          ">
+          <button className="text-xs text-slate-500 border border-slate-200 rounded-md px-3 py-1.5 hover:bg-slate-50 transition-colors">
             ⧉ Copy JSON
           </button>
         </div>
       </header>
 
-      {/* main content */}
-      <main className="flex flex-1">
+      {/* panels */}
+      <main className="flex flex-1 min-h-0">
 
-        {/* ── left: keplerian ── */}
-        <section className="flex-1 px-10 py-8 border-r border-slate-100 bg-white">
+        {/* keplerian */}
+        <section className="flex-1 px-8 py-5 border-r border-slate-100 flex flex-col">
           <PanelHeader dot="blue" title="Keplerian elements" badge="inputs" />
 
-          <SectionLabel>Shape</SectionLabel>
+          <SectionDivider label="Shape" />
           <Field symbol="a" label="Semi-major axis" value={KEPLERIAN.a}     unit="km"  />
           <Field symbol="e" label="Eccentricity"    value={KEPLERIAN.e}     unit="—"   />
 
-          <SectionLabel>Orientation</SectionLabel>
-          <Field symbol="i" label="Inclination"         value={KEPLERIAN.i}     unit="deg" />
-          <Field symbol="Ω" label="RAAN"                value={KEPLERIAN.raan}  unit="deg" />
-          <Field symbol="ω" label="Arg. of periapsis"   value={KEPLERIAN.omega} unit="deg" />
+          <SectionDivider label="Orientation" />
+          <Field symbol="i" label="Inclination"       value={KEPLERIAN.i}     unit="deg" />
+          <Field symbol="Ω" label="RAAN"              value={KEPLERIAN.raan}  unit="deg" />
+          <Field symbol="ω" label="Arg. of periapsis" value={KEPLERIAN.omega} unit="deg" />
 
-          <SectionLabel>Position</SectionLabel>
+          <SectionDivider label="Position" />
           <Field symbol="ν" label="True anomaly" value={KEPLERIAN.nu} unit="deg" />
         </section>
 
-        {/* ── exchange icon ── */}
-        <div className="flex items-center justify-center w-14 shrink-0 bg-white border-r border-slate-100">
-          <span className="text-lg text-slate-300 select-none">⇌</span>
+        {/* exchange */}
+        <div className="flex items-center justify-center w-12 shrink-0 border-r border-slate-100">
+          <span className="text-base text-slate-300 select-none">⇌</span>
         </div>
 
-        {/* ── right: cartesian ── */}
-        <section className="flex-1 px-10 py-8 bg-white">
+        {/* cartesian */}
+        <section className="flex-1 px-8 py-5 flex flex-col">
           <PanelHeader dot="green" title="Cartesian state vector" badge="computed" />
 
-          <SectionLabel>Position (ECI)</SectionLabel>
-          <Field symbol="x"  value={CARTESIAN.x}  unit="km"   />
-          <Field symbol="y"  value={CARTESIAN.y}  unit="km"   />
-          <Field symbol="z"  value={CARTESIAN.z}  unit="km"   />
+          <SectionDivider label="Position (ECI)" />
+          <Field symbol="x"  value={CARTESIAN.x}  unit="km"   readOnly />
+          <Field symbol="y"  value={CARTESIAN.y}  unit="km"   readOnly />
+          <Field symbol="z"  value={CARTESIAN.z}  unit="km"   readOnly />
 
-          <SectionLabel>Velocity (ECI)</SectionLabel>
-          <Field symbol="vx" value={CARTESIAN.vx} unit="km/s" />
-          <Field symbol="vy" value={CARTESIAN.vy} unit="km/s" />
-          <Field symbol="vz" value={CARTESIAN.vz} unit="km/s" />
+          <SectionDivider label="Velocity (ECI)" />
+          <Field symbol="vx" value={CARTESIAN.vx} unit="km/s" readOnly />
+          <Field symbol="vy" value={CARTESIAN.vy} unit="km/s" readOnly />
+          <Field symbol="vz" value={CARTESIAN.vz} unit="km/s" readOnly />
 
-          <SectionLabel>Derived</SectionLabel>
-          <Field symbol="|r|" label="Distance from Earth" value={CARTESIAN.r} unit="km"   />
-          <Field symbol="|v|" label="Speed"               value={CARTESIAN.v} unit="km/s" />
+          <SectionDivider label="Derived" />
+          <Field symbol="|r|" label="Distance from Earth" value={CARTESIAN.r} unit="km"   readOnly />
+          <Field symbol="|v|" label="Speed"               value={CARTESIAN.v} unit="km/s" readOnly />
         </section>
 
       </main>
