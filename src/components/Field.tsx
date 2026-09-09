@@ -9,10 +9,10 @@ interface FieldProps {
 
 export function Field({ symbol, label, value, unit, readOnly = false, onChange }: FieldProps) {
   return (
-    <div className="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
-      <span className="w-7 text-sm text-slate-700 font-medium shrink-0">{symbol}</span>
+    <div className="flex items-center gap-2 py-1.5 border-b border-slate-100 last:border-0">
+      <span className="w-5 text-xs text-slate-700 font-medium shrink-0">{symbol}</span>
       {label
-        ? <span className="flex-1 text-sm text-slate-400">{label}</span>
+        ? <span className="flex-1 text-xs text-slate-400 truncate">{label}</span>
         : <span className="flex-1" />
       }
       <input
@@ -21,13 +21,13 @@ export function Field({ symbol, label, value, unit, readOnly = false, onChange }
         readOnly={readOnly}
         onChange={e => onChange?.(e.target.value)}
         className={`
-          w-28 text-right text-sm font-medium text-slate-800 tabular-nums
-          border border-slate-200 rounded-lg px-3 py-1 bg-white
+          w-20 text-right text-xs font-medium text-slate-800 tabular-nums
+          border border-slate-200 rounded-md px-2 py-1 bg-white
           outline-none transition-colors
           ${readOnly ? 'cursor-default text-slate-600' : 'focus:border-slate-400'}
         `}
       />
-      <span className="w-9 text-xs text-slate-400 shrink-0">{unit}</span>
+      <span className="w-7 text-[10px] text-slate-400 shrink-0">{unit}</span>
     </div>
   );
 }
