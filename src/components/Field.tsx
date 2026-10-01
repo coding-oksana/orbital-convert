@@ -7,6 +7,9 @@ interface FieldProps {
   onChange?: (value: string) => void;
 }
 
+// optional sign, digits (spaces allowed for grouping), optional single decimal point
+const NUMERIC_INPUT = /^[-−–—]?[\d ]*\.?\d*$/;
+
 export function Field({ symbol, label, value, unit, readOnly = false, onChange }: FieldProps) {
   return (
     <div className="flex items-center gap-2 py-1.5 border-b border-slate-100 last:border-0">
@@ -19,7 +22,11 @@ export function Field({ symbol, label, value, unit, readOnly = false, onChange }
         type="text"
         value={value}
         readOnly={readOnly}
-        onChange={e => onChange?.(e.target.value)}
+        inputMode="decimal"
+        onChange={e => {
+          const next = e.target.value.replace(',', '.');
+          if (NUMERIC_INPUT.test(next)) onChange?.(next);
+        }}
         className={`
           w-20 text-right text-xs font-medium text-slate-800 tabular-nums
           border border-slate-200 rounded-md px-2 py-1 bg-white

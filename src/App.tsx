@@ -8,18 +8,49 @@ import {
 } from './lib/obrital';
 
 const DECIMALS = {
-  a: 0, e: 3, i: 1, raan: 1, omega: 1, nu: 1,
-  x: 1, y: 1, z: 1, vx: 3, vy: 3, vz: 3, r: 1, v: 3,
+  a: 0,
+  e: 3,
+  i: 1,
+  raan: 1,
+  omega: 1,
+  nu: 1,
+  x: 1,
+  y: 1,
+  z: 1,
+  vx: 3,
+  vy: 3,
+  vz: 3,
+  r: 1,
+  v: 3,
 };
 
-const INITIAL_KEPLERIAN = { a: 6786, e: 0.002, i: 51.6, raan: 247.0, omega: 130.0, nu: 332.5 };
+const INITIAL_KEPLERIAN = {
+  a: 6786,
+  e: 0.002,
+  i: 51.6,
+  raan: 247.0,
+  omega: 130.0,
+  nu: 332.5,
+};
 
-function PanelHeader({ dot, title, badge }: { dot: 'blue' | 'green'; title: string; badge: string }) {
+function PanelHeader({
+  dot,
+  title,
+  badge,
+}: {
+  dot: 'blue' | 'green';
+  title: string;
+  badge: string;
+}) {
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-2">
-        <span className={`w-2 h-2 rounded-full shrink-0 ${dot === 'blue' ? 'bg-blue-500' : 'bg-emerald-500'}`} />
-        <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-600 uppercase">{title}</span>
+        <span
+          className={`w-2 h-2 rounded-full shrink-0 ${dot === 'blue' ? 'bg-blue-500' : 'bg-emerald-500'}`}
+        />
+        <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-600 uppercase">
+          {title}
+        </span>
       </div>
       <span className="text-xs text-slate-400">{badge}</span>
     </div>
@@ -60,7 +91,9 @@ export default function App() {
     v: formatNum(initialCartesian.v, DECIMALS.v),
   });
 
-  const [lastEdited, setLastEdited] = useState<'keplerian' | 'cartesian'>('keplerian');
+  const [lastEdited, setLastEdited] = useState<'keplerian' | 'cartesian'>(
+    'keplerian'
+  );
 
   function handleKeplerianChange(field: keyof typeof kepStr, raw: string) {
     const next = { ...kepStr, [field]: raw };
@@ -68,26 +101,42 @@ export default function App() {
     setLastEdited('keplerian');
 
     const parsed = {
-      a: parseNum(next.a), e: parseNum(next.e), i: parseNum(next.i),
-      raan: parseNum(next.raan), omega: parseNum(next.omega), nu: parseNum(next.nu),
+      a: parseNum(next.a),
+      e: parseNum(next.e),
+      i: parseNum(next.i),
+      raan: parseNum(next.raan),
+      omega: parseNum(next.omega),
+      nu: parseNum(next.nu),
     };
     if (Object.values(parsed).some((n) => Number.isNaN(n))) return;
 
     const cart = keplerianToCartesian(parsed);
     setCartStr({
-      x: formatNum(cart.x, DECIMALS.x), y: formatNum(cart.y, DECIMALS.y), z: formatNum(cart.z, DECIMALS.z),
-      vx: formatNum(cart.vx, DECIMALS.vx), vy: formatNum(cart.vy, DECIMALS.vy), vz: formatNum(cart.vz, DECIMALS.vz),
-      r: formatNum(cart.r, DECIMALS.r), v: formatNum(cart.v, DECIMALS.v),
+      x: formatNum(cart.x, DECIMALS.x),
+      y: formatNum(cart.y, DECIMALS.y),
+      z: formatNum(cart.z, DECIMALS.z),
+      vx: formatNum(cart.vx, DECIMALS.vx),
+      vy: formatNum(cart.vy, DECIMALS.vy),
+      vz: formatNum(cart.vz, DECIMALS.vz),
+      r: formatNum(cart.r, DECIMALS.r),
+      v: formatNum(cart.v, DECIMALS.v),
     });
   }
 
-  function handleCartesianChange(field: 'x' | 'y' | 'z' | 'vx' | 'vy' | 'vz', raw: string) {
+  function handleCartesianChange(
+    field: 'x' | 'y' | 'z' | 'vx' | 'vy' | 'vz',
+    raw: string
+  ) {
     const next = { ...cartStr, [field]: raw };
     setLastEdited('cartesian');
 
     const parsed = {
-      x: parseNum(next.x), y: parseNum(next.y), z: parseNum(next.z),
-      vx: parseNum(next.vx), vy: parseNum(next.vy), vz: parseNum(next.vz),
+      x: parseNum(next.x),
+      y: parseNum(next.y),
+      z: parseNum(next.z),
+      vx: parseNum(next.vx),
+      vy: parseNum(next.vy),
+      vz: parseNum(next.vz),
     };
     if (Object.values(parsed).some((n) => Number.isNaN(n))) {
       setCartStr(next);
@@ -98,30 +147,50 @@ export default function App() {
     const r = Math.sqrt(parsed.x ** 2 + parsed.y ** 2 + parsed.z ** 2);
     const v = Math.sqrt(parsed.vx ** 2 + parsed.vy ** 2 + parsed.vz ** 2);
 
-    setCartStr({ ...next, r: formatNum(r, DECIMALS.r), v: formatNum(v, DECIMALS.v) });
+    setCartStr({
+      ...next,
+      r: formatNum(r, DECIMALS.r),
+      v: formatNum(v, DECIMALS.v),
+    });
     setKepStr({
-      a: formatNum(kep.a, DECIMALS.a), e: formatNum(kep.e, DECIMALS.e), i: formatNum(kep.i, DECIMALS.i),
-      raan: formatNum(kep.raan, DECIMALS.raan), omega: formatNum(kep.omega, DECIMALS.omega), nu: formatNum(kep.nu, DECIMALS.nu),
+      a: formatNum(kep.a, DECIMALS.a),
+      e: formatNum(kep.e, DECIMALS.e),
+      i: formatNum(kep.i, DECIMALS.i),
+      raan: formatNum(kep.raan, DECIMALS.raan),
+      omega: formatNum(kep.omega, DECIMALS.omega),
+      nu: formatNum(kep.nu, DECIMALS.nu),
     });
   }
 
   function handleReset() {
     setKepStr({
-      a: formatNum(INITIAL_KEPLERIAN.a, DECIMALS.a), e: formatNum(INITIAL_KEPLERIAN.e, DECIMALS.e),
-      i: formatNum(INITIAL_KEPLERIAN.i, DECIMALS.i), raan: formatNum(INITIAL_KEPLERIAN.raan, DECIMALS.raan),
-      omega: formatNum(INITIAL_KEPLERIAN.omega, DECIMALS.omega), nu: formatNum(INITIAL_KEPLERIAN.nu, DECIMALS.nu),
+      a: formatNum(INITIAL_KEPLERIAN.a, DECIMALS.a),
+      e: formatNum(INITIAL_KEPLERIAN.e, DECIMALS.e),
+      i: formatNum(INITIAL_KEPLERIAN.i, DECIMALS.i),
+      raan: formatNum(INITIAL_KEPLERIAN.raan, DECIMALS.raan),
+      omega: formatNum(INITIAL_KEPLERIAN.omega, DECIMALS.omega),
+      nu: formatNum(INITIAL_KEPLERIAN.nu, DECIMALS.nu),
     });
     const cart = keplerianToCartesian(INITIAL_KEPLERIAN);
     setCartStr({
-      x: formatNum(cart.x, DECIMALS.x), y: formatNum(cart.y, DECIMALS.y), z: formatNum(cart.z, DECIMALS.z),
-      vx: formatNum(cart.vx, DECIMALS.vx), vy: formatNum(cart.vy, DECIMALS.vy), vz: formatNum(cart.vz, DECIMALS.vz),
-      r: formatNum(cart.r, DECIMALS.r), v: formatNum(cart.v, DECIMALS.v),
+      x: formatNum(cart.x, DECIMALS.x),
+      y: formatNum(cart.y, DECIMALS.y),
+      z: formatNum(cart.z, DECIMALS.z),
+      vx: formatNum(cart.vx, DECIMALS.vx),
+      vy: formatNum(cart.vy, DECIMALS.vy),
+      vz: formatNum(cart.vz, DECIMALS.vz),
+      r: formatNum(cart.r, DECIMALS.r),
+      v: formatNum(cart.v, DECIMALS.v),
     });
     setLastEdited('keplerian');
   }
 
   function handleCopyJSON() {
-    const payload = { keplerian: kepStr, cartesian: cartStr, source: lastEdited };
+    const payload = {
+      keplerian: kepStr,
+      cartesian: cartStr,
+      source: lastEdited,
+    };
     navigator.clipboard?.writeText(JSON.stringify(payload, null, 2));
   }
 
@@ -217,7 +286,13 @@ export default function App() {
 
           {/* exchange */}
           <div className="flex items-center justify-center w-8 shrink-0">
-            <span className="text-base text-slate-300 select-none">⇌</span>
+            <span
+              className={`text-xl font-bold select-none transition-colors duration-300 ${
+                lastEdited === 'keplerian' ? 'text-blue-500' : 'text-emerald-500'
+              }`}
+            >
+              {lastEdited === 'keplerian' ? '→' : '←'}
+            </span>
           </div>
 
           {/* cartesian */}
@@ -229,18 +304,60 @@ export default function App() {
             />
 
             <SectionDivider label="Position (ECI)" />
-            <Field symbol="x" value={cartStr.x} unit="km" onChange={(v) => handleCartesianChange('x', v)} />
-            <Field symbol="y" value={cartStr.y} unit="km" onChange={(v) => handleCartesianChange('y', v)} />
-            <Field symbol="z" value={cartStr.z} unit="km" onChange={(v) => handleCartesianChange('z', v)} />
+            <Field
+              symbol="x"
+              value={cartStr.x}
+              unit="km"
+              onChange={(v) => handleCartesianChange('x', v)}
+            />
+            <Field
+              symbol="y"
+              value={cartStr.y}
+              unit="km"
+              onChange={(v) => handleCartesianChange('y', v)}
+            />
+            <Field
+              symbol="z"
+              value={cartStr.z}
+              unit="km"
+              onChange={(v) => handleCartesianChange('z', v)}
+            />
 
             <SectionDivider label="Velocity (ECI)" />
-            <Field symbol="vx" value={cartStr.vx} unit="km/s" onChange={(v) => handleCartesianChange('vx', v)} />
-            <Field symbol="vy" value={cartStr.vy} unit="km/s" onChange={(v) => handleCartesianChange('vy', v)} />
-            <Field symbol="vz" value={cartStr.vz} unit="km/s" onChange={(v) => handleCartesianChange('vz', v)} />
+            <Field
+              symbol="vx"
+              value={cartStr.vx}
+              unit="km/s"
+              onChange={(v) => handleCartesianChange('vx', v)}
+            />
+            <Field
+              symbol="vy"
+              value={cartStr.vy}
+              unit="km/s"
+              onChange={(v) => handleCartesianChange('vy', v)}
+            />
+            <Field
+              symbol="vz"
+              value={cartStr.vz}
+              unit="km/s"
+              onChange={(v) => handleCartesianChange('vz', v)}
+            />
 
             <SectionDivider label="Derived" />
-            <Field symbol="|r|" label="Distance from Earth" value={cartStr.r} unit="km" readOnly />
-            <Field symbol="|v|" label="Speed" value={cartStr.v} unit="km/s" readOnly />
+            <Field
+              symbol="|r|"
+              label="Distance from Earth"
+              value={cartStr.r}
+              unit="km"
+              readOnly
+            />
+            <Field
+              symbol="|v|"
+              label="Speed"
+              value={cartStr.v}
+              unit="km/s"
+              readOnly
+            />
           </section>
         </div>
       </main>
