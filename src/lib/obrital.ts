@@ -8,12 +8,7 @@ export function parseNum(str: string): number {
 export function formatNum(num: number, decimals: number): string {
   if (!isFinite(num)) return '';
   const fixed = num.toFixed(decimals);
-  const negative = fixed.startsWith('-');
-  const abs = negative ? fixed.slice(1) : fixed;
-  const [intPart, decPart] = abs.split('.');
-  const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-  const result = decPart !== undefined ? `${grouped}.${decPart}` : grouped;
-  return negative ? `−${result}` : result;
+  return fixed.startsWith('-') ? `−${fixed.slice(1)}` : fixed;
 }
 
 export interface Keplerian {

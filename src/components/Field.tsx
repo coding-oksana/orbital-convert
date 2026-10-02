@@ -7,8 +7,8 @@ interface FieldProps {
   onChange?: (value: string) => void;
 }
 
-// optional sign, digits (spaces allowed for grouping), optional single decimal point
-const NUMERIC_INPUT = /^[-−–—]?[\d ]*\.?\d*$/;
+// optional sign, digits, optional single decimal point
+const NUMERIC_INPUT = /^[-−–—]?\d*\.?\d*$/;
 
 export function Field({ symbol, label, value, unit, readOnly = false, onChange }: FieldProps) {
   return (
