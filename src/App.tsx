@@ -5,7 +5,9 @@ import {
   formatNum,
   keplerianToCartesian,
   cartesianToKeplerian,
-} from './lib/obrital';
+  type Keplerian,
+  type Cartesian,
+} from './lib/orbital';
 
 const DECIMALS = {
   a: 0,
@@ -32,6 +34,47 @@ const INITIAL_KEPLERIAN = {
   omega: 130.0,
   nu: 332.5,
 };
+
+const KEPLERIAN_KEYS = ['a', 'e', 'i', 'raan', 'omega', 'nu'] as const;
+const CARTESIAN_KEYS = ['x', 'y', 'z', 'vx', 'vy', 'vz'] as const;
+
+// returns null if any field is not a valid number yet (e.g. mid-typing)
+function parseFields<K extends string>(
+  values: Record<K, string>,
+  keys: readonly K[]
+): Record<K, number> | null {
+  const parsed = {} as Record<K, number>;
+  for (const key of keys) {
+    const n = parseNum(values[key]);
+    if (Number.isNaN(n)) return null;
+    parsed[key] = n;
+  }
+  return parsed;
+}
+
+function formatKeplerian(k: Keplerian) {
+  return {
+    a: formatNum(k.a, DECIMALS.a),
+    e: formatNum(k.e, DECIMALS.e),
+    i: formatNum(k.i, DECIMALS.i),
+    raan: formatNum(k.raan, DECIMALS.raan),
+    omega: formatNum(k.omega, DECIMALS.omega),
+    nu: formatNum(k.nu, DECIMALS.nu),
+  };
+}
+
+function formatCartesian(c: Cartesian) {
+  return {
+    x: formatNum(c.x, DECIMALS.x),
+    y: formatNum(c.y, DECIMALS.y),
+    z: formatNum(c.z, DECIMALS.z),
+    vx: formatNum(c.vx, DECIMALS.vx),
+    vy: formatNum(c.vy, DECIMALS.vy),
+    vz: formatNum(c.vz, DECIMALS.vz),
+    r: formatNum(c.r, DECIMALS.r),
+    v: formatNum(c.v, DECIMALS.v),
+  };
+}
 
 function PanelHeader({
   dot,
@@ -71,25 +114,9 @@ function SectionDivider({ label }: { label: string }) {
 export default function App() {
   const initialCartesian = keplerianToCartesian(INITIAL_KEPLERIAN);
 
-  const [kepStr, setKepStr] = useState({
-    a: formatNum(INITIAL_KEPLERIAN.a, DECIMALS.a),
-    e: formatNum(INITIAL_KEPLERIAN.e, DECIMALS.e),
-    i: formatNum(INITIAL_KEPLERIAN.i, DECIMALS.i),
-    raan: formatNum(INITIAL_KEPLERIAN.raan, DECIMALS.raan),
-    omega: formatNum(INITIAL_KEPLERIAN.omega, DECIMALS.omega),
-    nu: formatNum(INITIAL_KEPLERIAN.nu, DECIMALS.nu),
-  });
+  const [kepStr, setKepStr] = useState(formatKeplerian(INITIAL_KEPLERIAN));
 
-  const [cartStr, setCartStr] = useState({
-    x: formatNum(initialCartesian.x, DECIMALS.x),
-    y: formatNum(initialCartesian.y, DECIMALS.y),
-    z: formatNum(initialCartesian.z, DECIMALS.z),
-    vx: formatNum(initialCartesian.vx, DECIMALS.vx),
-    vy: formatNum(initialCartesian.vy, DECIMALS.vy),
-    vz: formatNum(initialCartesian.vz, DECIMALS.vz),
-    r: formatNum(initialCartesian.r, DECIMALS.r),
-    v: formatNum(initialCartesian.v, DECIMALS.v),
-  });
+  const [cartStr, setCartStr] = useState(formatCartesian(initialCartesian));
 
   const [lastEdited, setLastEdited] = useState<'keplerian' | 'cartesian'>(
     'keplerian'
@@ -100,45 +127,22 @@ export default function App() {
     setKepStr(next);
     setLastEdited('keplerian');
 
-    const parsed = {
-      a: parseNum(next.a),
-      e: parseNum(next.e),
-      i: parseNum(next.i),
-      raan: parseNum(next.raan),
-      omega: parseNum(next.omega),
-      nu: parseNum(next.nu),
-    };
-    if (Object.values(parsed).some((n) => Number.isNaN(n))) return;
+    const parsed = parseFields(next, KEPLERIAN_KEYS);
+    if (!parsed) return;
 
     const cart = keplerianToCartesian(parsed);
-    setCartStr({
-      x: formatNum(cart.x, DECIMALS.x),
-      y: formatNum(cart.y, DECIMALS.y),
-      z: formatNum(cart.z, DECIMALS.z),
-      vx: formatNum(cart.vx, DECIMALS.vx),
-      vy: formatNum(cart.vy, DECIMALS.vy),
-      vz: formatNum(cart.vz, DECIMALS.vz),
-      r: formatNum(cart.r, DECIMALS.r),
-      v: formatNum(cart.v, DECIMALS.v),
-    });
+    setCartStr(formatCartesian(cart));
   }
 
   function handleCartesianChange(
-    field: 'x' | 'y' | 'z' | 'vx' | 'vy' | 'vz',
+    field: (typeof CARTESIAN_KEYS)[number],
     raw: string
   ) {
     const next = { ...cartStr, [field]: raw };
     setLastEdited('cartesian');
 
-    const parsed = {
-      x: parseNum(next.x),
-      y: parseNum(next.y),
-      z: parseNum(next.z),
-      vx: parseNum(next.vx),
-      vy: parseNum(next.vy),
-      vz: parseNum(next.vz),
-    };
-    if (Object.values(parsed).some((n) => Number.isNaN(n))) {
+    const parsed = parseFields(next, CARTESIAN_KEYS);
+    if (!parsed) {
       setCartStr(next);
       return;
     }
@@ -152,36 +156,12 @@ export default function App() {
       r: formatNum(r, DECIMALS.r),
       v: formatNum(v, DECIMALS.v),
     });
-    setKepStr({
-      a: formatNum(kep.a, DECIMALS.a),
-      e: formatNum(kep.e, DECIMALS.e),
-      i: formatNum(kep.i, DECIMALS.i),
-      raan: formatNum(kep.raan, DECIMALS.raan),
-      omega: formatNum(kep.omega, DECIMALS.omega),
-      nu: formatNum(kep.nu, DECIMALS.nu),
-    });
+    setKepStr(formatKeplerian(kep));
   }
 
   function handleReset() {
-    setKepStr({
-      a: formatNum(INITIAL_KEPLERIAN.a, DECIMALS.a),
-      e: formatNum(INITIAL_KEPLERIAN.e, DECIMALS.e),
-      i: formatNum(INITIAL_KEPLERIAN.i, DECIMALS.i),
-      raan: formatNum(INITIAL_KEPLERIAN.raan, DECIMALS.raan),
-      omega: formatNum(INITIAL_KEPLERIAN.omega, DECIMALS.omega),
-      nu: formatNum(INITIAL_KEPLERIAN.nu, DECIMALS.nu),
-    });
-    const cart = keplerianToCartesian(INITIAL_KEPLERIAN);
-    setCartStr({
-      x: formatNum(cart.x, DECIMALS.x),
-      y: formatNum(cart.y, DECIMALS.y),
-      z: formatNum(cart.z, DECIMALS.z),
-      vx: formatNum(cart.vx, DECIMALS.vx),
-      vy: formatNum(cart.vy, DECIMALS.vy),
-      vz: formatNum(cart.vz, DECIMALS.vz),
-      r: formatNum(cart.r, DECIMALS.r),
-      v: formatNum(cart.v, DECIMALS.v),
-    });
+    setKepStr(formatKeplerian(INITIAL_KEPLERIAN));
+    setCartStr(formatCartesian(keplerianToCartesian(INITIAL_KEPLERIAN)));
     setLastEdited('keplerian');
   }
 
@@ -191,7 +171,7 @@ export default function App() {
       cartesian: cartStr,
       source: lastEdited,
     };
-    navigator.clipboard?.writeText(JSON.stringify(payload, null, 2));
+    void navigator.clipboard?.writeText(JSON.stringify(payload, null, 2));
   }
 
   return (
@@ -288,7 +268,9 @@ export default function App() {
           <div className="flex items-center justify-center w-8 shrink-0">
             <span
               className={`text-xl font-bold select-none transition-colors duration-300 ${
-                lastEdited === 'keplerian' ? 'text-blue-500' : 'text-emerald-500'
+                lastEdited === 'keplerian'
+                  ? 'text-blue-500'
+                  : 'text-emerald-500'
               }`}
             >
               {lastEdited === 'keplerian' ? '→' : '←'}

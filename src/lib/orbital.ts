@@ -127,7 +127,7 @@ export function cartesianToKeplerian(
   }
 
   const deg = 180 / Math.PI;
-  
+
   return {
     a,
     e,
