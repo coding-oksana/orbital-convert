@@ -1,4 +1,5 @@
-const MU_EARTH = 398600.4418; // km^3/s^2
+export const MU_EARTH = 398600.4418; // km^3/s^2
+export const EARTH_RADIUS = 6378.137; // km, equatorial
 
 export function parseNum(str: string): number {
   const cleaned = str.replace(/\s/g, '').replace(/[−–—]/g, '-');

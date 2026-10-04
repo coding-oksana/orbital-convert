@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { Field } from './components/Field';
 import {
-  parseNum,
   formatNum,
   keplerianToCartesian,
   cartesianToKeplerian,
   type Keplerian,
   type Cartesian,
 } from './lib/orbital';
+import {
+  checkCartesian,
+  checkKeplerian,
+  type CartesianKey,
+  type Issue,
+  type KeplerianKey,
+} from './lib/validation';
 
 const DECIMALS = {
   a: 0,
@@ -34,23 +40,6 @@ const INITIAL_KEPLERIAN = {
   omega: 130.0,
   nu: 332.5,
 };
-
-const KEPLERIAN_KEYS = ['a', 'e', 'i', 'raan', 'omega', 'nu'] as const;
-const CARTESIAN_KEYS = ['x', 'y', 'z', 'vx', 'vy', 'vz'] as const;
-
-// returns null if any field is not a valid number yet (e.g. mid-typing)
-function parseFields<K extends string>(
-  values: Record<K, string>,
-  keys: readonly K[]
-): Record<K, number> | null {
-  const parsed = {} as Record<K, number>;
-  for (const key of keys) {
-    const n = parseNum(values[key]);
-    if (Number.isNaN(n)) return null;
-    parsed[key] = n;
-  }
-  return parsed;
-}
 
 function formatKeplerian(k: Keplerian) {
   return {
@@ -100,6 +89,26 @@ function PanelHeader({
   );
 }
 
+function IssueList({ issues }: { issues: Issue[] }) {
+  if (issues.length === 0) return null;
+  return (
+    <ul className="mt-3 flex flex-col gap-1">
+      {issues.map((issue) => (
+        <li
+          key={issue.message}
+          className={`text-[11px] leading-snug ${issue.severity === 'error' ? 'text-red-600' : 'text-amber-600'}`}
+        >
+          {issue.message}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function hasError(issues: Issue[]) {
+  return issues.some((issue) => issue.severity === 'error');
+}
+
 function SectionDivider({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-2 mt-3 mb-1">
@@ -122,34 +131,44 @@ export default function App() {
     'keplerian'
   );
 
-  function handleKeplerianChange(field: keyof typeof kepStr, raw: string) {
+  const [kepIssues, setKepIssues] = useState<Issue<KeplerianKey>[]>([]);
+  const [cartIssues, setCartIssues] = useState<Issue<CartesianKey>[]>([]);
+
+  // the computed panel is out of date while the source panel has errors
+  const kepStale = lastEdited === 'cartesian' && hasError(cartIssues);
+  const cartStale = lastEdited === 'keplerian' && hasError(kepIssues);
+
+  const kepInvalid = (key: KeplerianKey) =>
+    kepIssues.some((i) => i.severity === 'error' && i.fields.includes(key));
+  const cartInvalid = (key: CartesianKey) =>
+    cartIssues.some((i) => i.severity === 'error' && i.fields.includes(key));
+
+  function handleKeplerianChange(field: KeplerianKey, raw: string) {
     const next = { ...kepStr, [field]: raw };
     setKepStr(next);
     setLastEdited('keplerian');
 
-    const parsed = parseFields(next, KEPLERIAN_KEYS);
-    if (!parsed) return;
+    const { values, issues } = checkKeplerian(next);
+    setKepIssues(issues);
+    setCartIssues([]);
+    if (!values) return;
 
-    const cart = keplerianToCartesian(parsed);
-    setCartStr(formatCartesian(cart));
+    setCartStr(formatCartesian(keplerianToCartesian(values)));
   }
 
-  function handleCartesianChange(
-    field: (typeof CARTESIAN_KEYS)[number],
-    raw: string
-  ) {
+  function handleCartesianChange(field: CartesianKey, raw: string) {
     const next = { ...cartStr, [field]: raw };
+    setCartStr(next);
     setLastEdited('cartesian');
 
-    const parsed = parseFields(next, CARTESIAN_KEYS);
-    if (!parsed) {
-      setCartStr(next);
-      return;
-    }
+    const { values, issues } = checkCartesian(next);
+    setCartIssues(issues);
+    setKepIssues([]);
+    if (!values) return;
 
-    const kep = cartesianToKeplerian(parsed);
-    const r = Math.sqrt(parsed.x ** 2 + parsed.y ** 2 + parsed.z ** 2);
-    const v = Math.sqrt(parsed.vx ** 2 + parsed.vy ** 2 + parsed.vz ** 2);
+    const kep = cartesianToKeplerian(values);
+    const r = Math.sqrt(values.x ** 2 + values.y ** 2 + values.z ** 2);
+    const v = Math.sqrt(values.vx ** 2 + values.vy ** 2 + values.vz ** 2);
 
     setCartStr({
       ...next,
@@ -163,6 +182,8 @@ export default function App() {
     setKepStr(formatKeplerian(INITIAL_KEPLERIAN));
     setCartStr(formatCartesian(keplerianToCartesian(INITIAL_KEPLERIAN)));
     setLastEdited('keplerian');
+    setKepIssues([]);
+    setCartIssues([]);
   }
 
   function handleCopyJSON() {
@@ -208,11 +229,19 @@ export default function App() {
       <main className="flex flex-1 min-h-0 items-center justify-center px-8 py-6">
         <div className="flex items-center gap-6">
           {/* keplerian */}
-          <section className="w-100 shrink-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4">
+          <section
+            className={`transition-opacity ${kepStale ? 'opacity-50' : ''} w-100 shrink-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4`}
+          >
             <PanelHeader
               dot="blue"
               title="Keplerian elements"
-              badge={lastEdited === 'keplerian' ? 'source' : 'computed'}
+              badge={
+                lastEdited === 'keplerian'
+                  ? 'source'
+                  : kepStale
+                    ? 'not updated'
+                    : 'computed'
+              }
             />
 
             <SectionDivider label="Shape" />
@@ -221,6 +250,7 @@ export default function App() {
               label="Semi-major axis"
               value={kepStr.a}
               unit="km"
+              invalid={kepInvalid('a')}
               onChange={(v) => handleKeplerianChange('a', v)}
             />
             <Field
@@ -228,6 +258,7 @@ export default function App() {
               label="Eccentricity"
               value={kepStr.e}
               unit="—"
+              invalid={kepInvalid('e')}
               onChange={(v) => handleKeplerianChange('e', v)}
             />
 
@@ -237,6 +268,7 @@ export default function App() {
               label="Inclination"
               value={kepStr.i}
               unit="deg"
+              invalid={kepInvalid('i')}
               onChange={(v) => handleKeplerianChange('i', v)}
             />
             <Field
@@ -244,6 +276,7 @@ export default function App() {
               label="RAAN"
               value={kepStr.raan}
               unit="deg"
+              invalid={kepInvalid('raan')}
               onChange={(v) => handleKeplerianChange('raan', v)}
             />
             <Field
@@ -251,6 +284,7 @@ export default function App() {
               label="Arg. of periapsis"
               value={kepStr.omega}
               unit="deg"
+              invalid={kepInvalid('omega')}
               onChange={(v) => handleKeplerianChange('omega', v)}
             />
 
@@ -260,8 +294,10 @@ export default function App() {
               label="True anomaly"
               value={kepStr.nu}
               unit="deg"
+              invalid={kepInvalid('nu')}
               onChange={(v) => handleKeplerianChange('nu', v)}
             />
+            <IssueList issues={kepIssues} />
           </section>
 
           {/* exchange */}
@@ -278,11 +314,19 @@ export default function App() {
           </div>
 
           {/* cartesian */}
-          <section className="w-100 shrink-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4">
+          <section
+            className={`transition-opacity ${cartStale ? 'opacity-50' : ''} w-100 shrink-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4`}
+          >
             <PanelHeader
               dot="green"
               title="Cartesian state vector"
-              badge={lastEdited === 'cartesian' ? 'source' : 'computed'}
+              badge={
+                lastEdited === 'cartesian'
+                  ? 'source'
+                  : cartStale
+                    ? 'not updated'
+                    : 'computed'
+              }
             />
 
             <SectionDivider label="Position (ECI)" />
@@ -290,18 +334,21 @@ export default function App() {
               symbol="x"
               value={cartStr.x}
               unit="km"
+              invalid={cartInvalid('x')}
               onChange={(v) => handleCartesianChange('x', v)}
             />
             <Field
               symbol="y"
               value={cartStr.y}
               unit="km"
+              invalid={cartInvalid('y')}
               onChange={(v) => handleCartesianChange('y', v)}
             />
             <Field
               symbol="z"
               value={cartStr.z}
               unit="km"
+              invalid={cartInvalid('z')}
               onChange={(v) => handleCartesianChange('z', v)}
             />
 
@@ -310,18 +357,21 @@ export default function App() {
               symbol="vx"
               value={cartStr.vx}
               unit="km/s"
+              invalid={cartInvalid('vx')}
               onChange={(v) => handleCartesianChange('vx', v)}
             />
             <Field
               symbol="vy"
               value={cartStr.vy}
               unit="km/s"
+              invalid={cartInvalid('vy')}
               onChange={(v) => handleCartesianChange('vy', v)}
             />
             <Field
               symbol="vz"
               value={cartStr.vz}
               unit="km/s"
+              invalid={cartInvalid('vz')}
               onChange={(v) => handleCartesianChange('vz', v)}
             />
 
@@ -340,6 +390,7 @@ export default function App() {
               unit="km/s"
               readOnly
             />
+            <IssueList issues={cartIssues} />
           </section>
         </div>
       </main>

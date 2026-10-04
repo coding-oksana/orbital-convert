@@ -4,6 +4,7 @@ interface FieldProps {
   value: string;
   unit: string;
   readOnly?: boolean;
+  invalid?: boolean;
   onChange?: (value: string) => void;
 }
 
@@ -16,6 +17,7 @@ export function Field({
   value,
   unit,
   readOnly = false,
+  invalid = false,
   onChange,
 }: FieldProps) {
   return (
@@ -33,15 +35,17 @@ export function Field({
         value={value}
         readOnly={readOnly}
         inputMode="decimal"
+        aria-invalid={invalid || undefined}
         onChange={(e) => {
           const next = e.target.value.replace(',', '.');
           if (NUMERIC_INPUT.test(next)) onChange?.(next);
         }}
         className={`
           w-20 text-right text-xs font-medium text-slate-800 tabular-nums
-          border border-slate-200 rounded-md px-2 py-1 bg-white
+          border rounded-md px-2 py-1
           outline-none transition-colors
-          ${readOnly ? 'cursor-default text-slate-600' : 'focus:border-slate-400'}
+          ${invalid ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-slate-200 bg-white'}
+          ${readOnly ? 'cursor-default text-slate-600' : invalid ? '' : 'focus:border-slate-400'}
         `}
       />
       <span className="w-7 text-[10px] text-slate-400 shrink-0">{unit}</span>
