@@ -110,21 +110,42 @@ export function cartesianToKeplerian(
   const a = -mu / (2 * energy);
   const i = Math.acos(Math.min(1, Math.max(-1, hz / h)));
 
-  let raan = n > 1e-8 ? Math.acos(Math.min(1, Math.max(-1, nx / n))) : 0;
-  if (ny < 0) raan = 2 * Math.PI - raan;
+  // circular: no periapsis, so ω and ν are undefined
+  // equatorial: no ascending node, so Ω is undefined
+  // in those cases the missing angle is set to 0 and the others are measured
+  // from a fallback direction, so the satellite's position is never lost
+  const circular = e < 1e-8;
+  const equatorial = n < 1e-8 * h;
+  const retrograde = hz < 0;
+  const clampAcos = (t: number) => Math.acos(Math.min(1, Math.max(-1, t)));
+  const wrap = (angle: number) => (angle + 2 * Math.PI) % (2 * Math.PI);
 
-  let omega = 0;
-  if (n > 1e-8 && e > 1e-8) {
-    omega = Math.acos(Math.min(1, Math.max(-1, (nx * ex + ny * ey) / (n * e))));
-    if (ez < 0) omega = 2 * Math.PI - omega;
+  let raan = 0;
+  if (!equatorial) {
+    raan = clampAcos(nx / n);
+    if (ny < 0) raan = 2 * Math.PI - raan;
   }
 
-  let nu = 0;
-  if (e > 1e-8) {
-    nu = Math.acos(
-      Math.min(1, Math.max(-1, (ex * x + ey * y + ez * z) / (e * r)))
-    );
+  let omega = 0;
+  let nu: number;
+  if (!circular) {
+    nu = clampAcos((ex * x + ey * y + ez * z) / (e * r));
     if (rdotv < 0) nu = 2 * Math.PI - nu;
+
+    if (!equatorial) {
+      omega = clampAcos((nx * ex + ny * ey) / (n * e));
+      if (ez < 0) omega = 2 * Math.PI - omega;
+    } else {
+      // longitude of periapsis: measured from the x axis instead of the node
+      omega = wrap(retrograde ? Math.atan2(-ey, ex) : Math.atan2(ey, ex));
+    }
+  } else if (!equatorial) {
+    // argument of latitude: ν measured from the ascending node instead of periapsis
+    nu = clampAcos((nx * x + ny * y) / (n * r));
+    if (z < 0) nu = 2 * Math.PI - nu;
+  } else {
+    // true longitude: ν measured from the x axis
+    nu = wrap(retrograde ? Math.atan2(-y, x) : Math.atan2(y, x));
   }
 
   const deg = 180 / Math.PI;
