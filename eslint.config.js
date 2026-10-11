@@ -35,4 +35,10 @@ export default tseslint.config(
       "prettier/prettier": "error",
     },
   },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ["cypress/**/*.ts", "cypress.config.ts"],
+    plugins: { prettier },
+    rules: { "prettier/prettier": "error" },
+  },
 );

@@ -1,4 +1,5 @@
 interface FieldProps {
+  name: string;
   symbol: string;
   label?: string;
   value: string;
@@ -12,6 +13,7 @@ interface FieldProps {
 const NUMERIC_INPUT = /^[-−–—]?\d*\.?\d*$/;
 
 export function Field({
+  name,
   symbol,
   label,
   value,
@@ -32,6 +34,9 @@ export function Field({
       )}
       <input
         type="text"
+        name={name}
+        aria-label={label ? `${label} (${symbol})` : symbol}
+        data-cy={`field-${name}`}
         value={value}
         readOnly={readOnly}
         inputMode="decimal"

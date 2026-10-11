@@ -1,75 +1,66 @@
-# React + TypeScript + Vite
+# Orbital element converter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small web app that converts a satellite orbit between two descriptions:
 
-Currently, two official plugins are available:
+- **Keplerian elements**: semi-major axis `a`, eccentricity `e`, inclination `i`, right ascension of the ascending node `Ω`, argument of periapsis `ω` and true anomaly `ν`.
+- **Cartesian state vector**: position `x, y, z` and velocity `vx, vy, vz`.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Edit either panel and the other one updates. Values that don't make physical sense (for example `e ≥ 1`, a position inside Earth or a speed above escape speed) are flagged and are not converted.
 
-## React Compiler
+## Conventions
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+|              |                                                                                                                  |
+| ------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Frame        | Earth-centred inertial (ECI): origin at Earth's centre, `z` toward the North Pole, `x` toward the vernal equinox |
+| Units        | km, km/s, degrees                                                                                                |
+| Gravity      | Two-body only, μ = 398600.4418 km³/s²                                                                            |
+| Earth radius | 6378.137 km (equatorial), used for the "inside Earth" checks                                                     |
+| Orbits       | Closed (elliptical) orbits only: `0 ≤ e < 1`, `a > 0`                                                            |
 
-## Expanding the ESLint configuration
+Undefined angles are handled as follows:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Circular orbits have no periapsis, so `ω = 0` and `ν` is measured from the ascending node (argument of latitude).
+- Equatorial orbits have no ascending node, so `Ω = 0` and `ω` is measured from the `x` axis (longitude of periapsis).
+- Circular equatorial orbits set `Ω = ω = 0`, and `ν` is measured from the `x` axis (true longitude).
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Requires Node.js 22 or later.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Then open http://localhost:5173.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Command             | What it does                                                                |
+| ------------------- | --------------------------------------------------------------------------- |
+| `npm run dev`       | Start the dev server                                                        |
+| `npm run build`     | Type-check and build for production into `dist/`                            |
+| `npm run preview`   | Serve the production build                                                  |
+| `npm run typecheck` | Type-check the app, Vite config and Cypress tests                           |
+| `npm run lint`      | Run ESLint (includes Prettier formatting)                                   |
+| `npm run fix`       | Fix lint and formatting problems where possible                             |
+| `npm run prettier`  | Format every file with Prettier                                             |
+| `npm run test:e2e`  | Start the dev server and run the Cypress tests headlessly                   |
+| `npm run cy:open`   | Open the Cypress app to run tests interactively (start `npm run dev` first) |
+
+## Project structure
 
 ```
+src/
+  App.tsx               page layout and state for both panels
+  components/Field.tsx  one labelled numeric input
+  lib/orbital.ts        conversion maths, parsing and formatting
+  lib/validation.ts     checks for values that don't make physical sense
+cypress/e2e/            end-to-end tests
+```
+
+## Tests
+
+End-to-end tests live in `cypress/e2e/converter.cy.ts`. They cover the conversions in both directions, a geostationary round trip, input filtering, every validation message, Reset and Copy JSON. Elements are selected with `data-cy` attributes.
+
+CI (`.github/workflows/ci.yml`) runs lint, the production build (including the type check) and the Cypress tests on every push to `master` and on pull requests.

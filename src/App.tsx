@@ -84,7 +84,9 @@ function PanelHeader({
           {title}
         </span>
       </div>
-      <span className="text-xs text-slate-400">{badge}</span>
+      <span data-cy={`badge-${dot}`} className="text-xs text-slate-400">
+        {badge}
+      </span>
     </div>
   );
 }
@@ -96,6 +98,7 @@ function IssueList({ issues }: { issues: Issue[] }) {
       {issues.map((issue) => (
         <li
           key={issue.message}
+          data-cy={`issue-${issue.severity}`}
           className={`text-[11px] leading-snug ${issue.severity === 'error' ? 'text-red-600' : 'text-amber-600'}`}
         >
           {issue.message}
@@ -210,12 +213,14 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              data-cy="reset"
               onClick={handleReset}
               className="text-xs text-slate-500 border border-slate-200 rounded-md px-3 py-1.5 hover:bg-slate-50 transition-colors"
             >
               ↺ Reset
             </button>
             <button
+              data-cy="copy-json"
               onClick={handleCopyJSON}
               className="text-xs text-slate-500 border border-slate-200 rounded-md px-3 py-1.5 hover:bg-slate-50 transition-colors"
             >
@@ -230,6 +235,7 @@ export default function App() {
         <div className="flex items-center gap-6">
           {/* keplerian */}
           <section
+            data-cy="panel-keplerian"
             className={`transition-opacity ${kepStale ? 'opacity-50' : ''} w-100 shrink-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4`}
           >
             <PanelHeader
@@ -246,6 +252,7 @@ export default function App() {
 
             <SectionDivider label="Shape" />
             <Field
+              name="a"
               symbol="a"
               label="Semi-major axis"
               value={kepStr.a}
@@ -254,6 +261,7 @@ export default function App() {
               onChange={(v) => handleKeplerianChange('a', v)}
             />
             <Field
+              name="e"
               symbol="e"
               label="Eccentricity"
               value={kepStr.e}
@@ -264,6 +272,7 @@ export default function App() {
 
             <SectionDivider label="Orientation" />
             <Field
+              name="i"
               symbol="i"
               label="Inclination"
               value={kepStr.i}
@@ -272,6 +281,7 @@ export default function App() {
               onChange={(v) => handleKeplerianChange('i', v)}
             />
             <Field
+              name="raan"
               symbol="Ω"
               label="RAAN"
               value={kepStr.raan}
@@ -280,6 +290,7 @@ export default function App() {
               onChange={(v) => handleKeplerianChange('raan', v)}
             />
             <Field
+              name="omega"
               symbol="ω"
               label="Arg. of periapsis"
               value={kepStr.omega}
@@ -290,6 +301,7 @@ export default function App() {
 
             <SectionDivider label="Position" />
             <Field
+              name="nu"
               symbol="ν"
               label="True anomaly"
               value={kepStr.nu}
@@ -315,6 +327,7 @@ export default function App() {
 
           {/* cartesian */}
           <section
+            data-cy="panel-cartesian"
             className={`transition-opacity ${cartStale ? 'opacity-50' : ''} w-100 shrink-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4`}
           >
             <PanelHeader
@@ -331,6 +344,7 @@ export default function App() {
 
             <SectionDivider label="Position (ECI)" />
             <Field
+              name="x"
               symbol="x"
               value={cartStr.x}
               unit="km"
@@ -338,6 +352,7 @@ export default function App() {
               onChange={(v) => handleCartesianChange('x', v)}
             />
             <Field
+              name="y"
               symbol="y"
               value={cartStr.y}
               unit="km"
@@ -345,6 +360,7 @@ export default function App() {
               onChange={(v) => handleCartesianChange('y', v)}
             />
             <Field
+              name="z"
               symbol="z"
               value={cartStr.z}
               unit="km"
@@ -354,6 +370,7 @@ export default function App() {
 
             <SectionDivider label="Velocity (ECI)" />
             <Field
+              name="vx"
               symbol="vx"
               value={cartStr.vx}
               unit="km/s"
@@ -361,6 +378,7 @@ export default function App() {
               onChange={(v) => handleCartesianChange('vx', v)}
             />
             <Field
+              name="vy"
               symbol="vy"
               value={cartStr.vy}
               unit="km/s"
@@ -368,6 +386,7 @@ export default function App() {
               onChange={(v) => handleCartesianChange('vy', v)}
             />
             <Field
+              name="vz"
               symbol="vz"
               value={cartStr.vz}
               unit="km/s"
@@ -377,6 +396,7 @@ export default function App() {
 
             <SectionDivider label="Derived" />
             <Field
+              name="r"
               symbol="|r|"
               label="Distance from Earth"
               value={cartStr.r}
@@ -384,6 +404,7 @@ export default function App() {
               readOnly
             />
             <Field
+              name="v"
               symbol="|v|"
               label="Speed"
               value={cartStr.v}
