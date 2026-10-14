@@ -141,5 +141,20 @@ describe('Orbital element converter', () => {
         expect(data.cartesian.x).to.eq('4354.2');
         expect(data.source).to.eq('keplerian');
       });
+
+    cy.get('[data-cy=copy-tooltip]').should('have.text', '✓ Copied');
+    cy.get('[data-cy=copy-tooltip]').should('not.exist');
+  });
+
+  it('says so when copying fails', () => {
+    cy.window().then((win) => {
+      cy.stub(win.navigator.clipboard, 'writeText').rejects(
+        new Error('denied')
+      );
+    });
+
+    cy.get('[data-cy=copy-json]').click();
+
+    cy.get('[data-cy=copy-tooltip]').should('have.text', "Couldn't copy");
   });
 });

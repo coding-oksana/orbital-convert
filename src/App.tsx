@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Field } from './components/Field';
 import {
   formatNum,
@@ -137,6 +137,12 @@ export default function App() {
   const [kepIssues, setKepIssues] = useState<Issue<KeplerianKey>[]>([]);
   const [cartIssues, setCartIssues] = useState<Issue<CartesianKey>[]>([]);
 
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>(
+    'idle'
+  );
+  const copyTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+
   // the computed panel is out of date while the source panel has errors
   const kepStale = lastEdited === 'cartesian' && hasError(cartIssues);
   const cartStale = lastEdited === 'keplerian' && hasError(kepIssues);
@@ -189,13 +195,21 @@ export default function App() {
     setCartIssues([]);
   }
 
-  function handleCopyJSON() {
+  async function handleCopyJSON() {
     const payload = {
       keplerian: kepStr,
       cartesian: cartStr,
       source: lastEdited,
     };
-    void navigator.clipboard?.writeText(JSON.stringify(payload, null, 2));
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+      setCopyStatus('copied');
+    } catch {
+      // clipboard is unavailable (e.g. not https) or permission was denied
+      setCopyStatus('failed');
+    }
+    window.clearTimeout(copyTimer.current);
+    copyTimer.current = window.setTimeout(() => setCopyStatus('idle'), 1500);
   }
 
   return (
@@ -219,13 +233,27 @@ export default function App() {
             >
               ↺ Reset
             </button>
-            <button
-              data-cy="copy-json"
-              onClick={handleCopyJSON}
-              className="text-xs text-slate-500 border border-slate-200 rounded-md px-3 py-1.5 hover:bg-slate-50 transition-colors"
-            >
-              ⧉ Copy JSON
-            </button>
+            <div className="relative">
+              <button
+                data-cy="copy-json"
+                onClick={() => void handleCopyJSON()}
+                className="text-xs text-slate-500 border border-slate-200 rounded-md px-3 py-1.5 hover:bg-slate-50 transition-colors"
+              >
+                ⧉ Copy JSON
+              </button>
+              <div role="status" aria-live="polite">
+                {copyStatus !== 'idle' && (
+                  <span
+                    data-cy="copy-tooltip"
+                    className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 z-10 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-medium text-white shadow-md
+                      before:content-[''] before:absolute before:bottom-full before:left-1/2 before:-translate-x-1/2 before:border-4 before:border-transparent
+                      ${copyStatus === 'copied' ? 'bg-slate-800 before:border-b-slate-800' : 'bg-red-600 before:border-b-red-600'}`}
+                  >
+                    {copyStatus === 'copied' ? '✓ Copied' : "Couldn't copy"}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </header>
