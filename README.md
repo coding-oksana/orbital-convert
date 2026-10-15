@@ -1,5 +1,9 @@
 # Orbital element converter
 
+[![CI](https://github.com/coding-oksana/orbital-convert-playground/actions/workflows/ci.yml/badge.svg)](https://github.com/coding-oksana/orbital-convert-playground/actions/workflows/ci.yml)
+
+**Live app:** https://coding-oksana.github.io/orbital-convert-playground/
+
 A small web app that converts a satellite orbit between two descriptions:
 
 - **Keplerian elements**: semi-major axis `a`, eccentricity `e`, inclination `i`, right ascension of the ascending node `Ω`, argument of periapsis `ω` and true anomaly `ν`.
@@ -25,7 +29,7 @@ Undefined angles are handled as follows:
 
 ## Getting started
 
-Requires Node.js 22 or later.
+Requires Node.js 22 or later (the version is pinned in `.nvmrc`, so `nvm use` picks it up).
 
 ```sh
 npm install
@@ -61,6 +65,14 @@ cypress/e2e/            end-to-end tests
 
 ## Tests
 
-End-to-end tests live in `cypress/e2e/converter.cy.ts`. They cover the conversions in both directions, a geostationary round trip, input filtering, every validation message, Reset and Copy JSON. Elements are selected with `data-cy` attributes.
+End-to-end tests live in `cypress/e2e/`. `converter.cy.ts` covers the conversions in both directions, a geostationary round trip, input filtering, every validation message, Reset and Copy JSON. `layout.cy.ts` checks the layout on phone, tablet and desktop widths. Elements are selected with `data-cy` attributes.
 
-CI (`.github/workflows/ci.yml`) runs lint, the production build (including the type check) and the Cypress tests on every push to `master` and on pull requests.
+## CI and deployment
+
+`.github/workflows/ci.yml` runs lint, the production build (including the type check) and the Cypress tests on every push to `master` and on pull requests. When all of them pass on `master`, the app is deployed to GitHub Pages.
+
+Dependabot (`.github/dependabot.yml`) opens weekly pull requests for npm packages and GitHub Actions. Minor and patch npm updates are grouped into one pull request.
+
+## License
+
+[MIT](LICENSE)

@@ -24,11 +24,13 @@ export function Field({
 }: FieldProps) {
   return (
     <div className="flex items-center gap-2 py-1.5 border-b border-slate-100 last:border-0">
-      <span className="w-5 text-xs text-slate-700 font-medium shrink-0">
+      <span className="w-6 sm:w-5 text-sm sm:text-xs text-slate-700 font-medium shrink-0">
         {symbol}
       </span>
       {label ? (
-        <span className="flex-1 text-xs text-slate-400 truncate">{label}</span>
+        <span className="flex-1 min-w-0 text-xs text-slate-400 truncate">
+          {label}
+        </span>
       ) : (
         <span className="flex-1" />
       )}
@@ -46,14 +48,16 @@ export function Field({
           if (NUMERIC_INPUT.test(next)) onChange?.(next);
         }}
         className={`
-          w-20 text-right text-xs font-medium text-slate-800 tabular-nums
-          border rounded-md px-2 py-1
+          w-24 sm:w-20 text-right text-base sm:text-xs font-medium text-slate-800 tabular-nums
+          border rounded-md px-2 py-1.5 sm:py-1
           outline-none transition-colors
           ${invalid ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-slate-200 bg-white'}
           ${readOnly ? 'cursor-default text-slate-600' : invalid ? '' : 'focus:border-slate-400'}
         `}
       />
-      <span className="w-7 text-[10px] text-slate-400 shrink-0">{unit}</span>
+      <span className="w-8 sm:w-7 text-[11px] sm:text-[10px] text-slate-400 shrink-0">
+        {unit}
+      </span>
     </div>
   );
 }

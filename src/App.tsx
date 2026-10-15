@@ -213,15 +213,15 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* header */}
       <header className="border-b border-slate-200 bg-white shrink-0">
-        <div className="w-[900px] mx-auto flex items-center justify-between px-2 py-3">
+        <div className="w-full max-w-[900px] mx-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
           <div className="flex items-center gap-2.5">
             <h1 className="text-sm font-semibold text-slate-800 tracking-tight">
               Orbital element converter
             </h1>
-            <span className="text-xs text-blue-500 border border-blue-200 bg-blue-50 rounded-full px-2.5 py-0.5">
+            <span className="hidden sm:inline text-xs text-blue-500 border border-blue-200 bg-blue-50 rounded-full px-2.5 py-0.5">
               Keplerian ↔ Cartesian
             </span>
           </div>
@@ -259,12 +259,12 @@ export default function App() {
       </header>
 
       {/* panels */}
-      <main className="flex flex-1 min-h-0 items-center justify-center px-8 py-6">
-        <div className="flex items-center gap-6">
+      <main className="flex flex-1 items-center justify-center px-4 py-4 sm:px-8 sm:py-6">
+        <div className="w-full max-w-md md:max-w-[900px] flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-6">
           {/* keplerian */}
           <section
             data-cy="panel-keplerian"
-            className={`transition-opacity ${kepStale ? 'opacity-50' : ''} w-100 shrink-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4`}
+            className={`transition-opacity ${kepStale ? 'opacity-50' : ''} w-full md:flex-1 md:max-w-100 min-w-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4`}
           >
             <PanelHeader
               dot="blue"
@@ -341,9 +341,9 @@ export default function App() {
           </section>
 
           {/* exchange */}
-          <div className="flex items-center justify-center w-8 shrink-0">
+          <div className="flex items-center justify-center h-8 md:h-auto md:w-8 shrink-0">
             <span
-              className={`text-xl font-bold select-none transition-colors duration-300 ${
+              className={`text-xl font-bold select-none transition-colors duration-300 rotate-90 md:rotate-0 ${
                 lastEdited === 'keplerian'
                   ? 'text-blue-500'
                   : 'text-emerald-500'
@@ -356,7 +356,7 @@ export default function App() {
           {/* cartesian */}
           <section
             data-cy="panel-cartesian"
-            className={`transition-opacity ${cartStale ? 'opacity-50' : ''} w-100 shrink-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4`}
+            className={`transition-opacity ${cartStale ? 'opacity-50' : ''} w-full md:flex-1 md:max-w-100 min-w-0 flex flex-col bg-white rounded-xl shadow-sm shadow-slate-200/60 border border-slate-100 px-5 py-4`}
           >
             <PanelHeader
               dot="green"
