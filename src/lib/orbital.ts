@@ -9,6 +9,8 @@ export function parseNum(str: string): number {
 export function formatNum(num: number, decimals: number): string {
   if (!isFinite(num)) return '';
   const fixed = num.toFixed(decimals);
+  // -0.04 rounds to "-0.0": drop the sign when the shown value is zero
+  if (Number(fixed) === 0) return fixed.replace('-', '');
   return fixed.startsWith('-') ? `−${fixed.slice(1)}` : fixed;
 }
 

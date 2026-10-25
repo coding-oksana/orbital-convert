@@ -40,17 +40,19 @@ Then open http://localhost:5173.
 
 ## Scripts
 
-| Command             | What it does                                                                |
-| ------------------- | --------------------------------------------------------------------------- |
-| `npm run dev`       | Start the dev server                                                        |
-| `npm run build`     | Type-check and build for production into `dist/`                            |
-| `npm run preview`   | Serve the production build                                                  |
-| `npm run typecheck` | Type-check the app, Vite config and Cypress tests                           |
-| `npm run lint`      | Run ESLint (includes Prettier formatting)                                   |
-| `npm run fix`       | Fix lint and formatting problems where possible                             |
-| `npm run prettier`  | Format every file with Prettier                                             |
-| `npm run test:e2e`  | Start the dev server and run the Cypress tests headlessly                   |
-| `npm run cy:open`   | Open the Cypress app to run tests interactively (start `npm run dev` first) |
+| Command              | What it does                                                                |
+| -------------------- | --------------------------------------------------------------------------- |
+| `npm run dev`        | Start the dev server                                                        |
+| `npm run build`      | Type-check and build for production into `dist/`                            |
+| `npm run preview`    | Serve the production build                                                  |
+| `npm run typecheck`  | Type-check the app, Vite config and Cypress tests                           |
+| `npm run lint`       | Run ESLint (includes Prettier formatting)                                   |
+| `npm run fix`        | Fix lint and formatting problems where possible                             |
+| `npm run prettier`   | Format every file with Prettier                                             |
+| `npm run test`       | Run the unit tests once                                                     |
+| `npm run test:watch` | Run the unit tests and re-run them when files change                        |
+| `npm run test:e2e`   | Start the dev server and run the Cypress tests headlessly                   |
+| `npm run cy:open`    | Open the Cypress app to run tests interactively (start `npm run dev` first) |
 
 ## Project structure
 
@@ -60,10 +62,16 @@ src/
   components/Field.tsx  one labelled numeric input
   lib/orbital.ts        conversion maths, parsing and formatting
   lib/validation.ts     checks for values that don't make physical sense
+  lib/*.test.ts         unit tests
 cypress/e2e/            end-to-end tests
 ```
 
 ## Tests
+
+Unit tests (Vitest) sit next to the code they test in `src/lib/`:
+
+- `orbital.test.ts` checks parsing and formatting, compares both conversions with Vallado's _Fundamentals of Astrodynamics_ (Examples 2-5 and 2-6), checks physical laws (vis-viva, angular momentum), the handling of circular and equatorial orbits, and round trips for a set of named orbits plus 1000 random ones.
+- `validation.test.ts` checks every validation rule, including edge values, and that the "would hit Earth" warning agrees with the conversion maths.
 
 End-to-end tests live in `cypress/e2e/`. `converter.cy.ts` covers the conversions in both directions, a geostationary round trip, input filtering, every validation message, Reset and Copy JSON. `layout.cy.ts` checks the layout on phone, tablet and desktop widths. Elements are selected with `data-cy` attributes.
 
