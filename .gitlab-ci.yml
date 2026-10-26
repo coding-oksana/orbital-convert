@@ -1,0 +1,27 @@
+image: node:22
+
+variables:
+  # Cypress isn't needed to build or run unit tests; skip its binary download
+  CYPRESS_INSTALL_BINARY: '0'
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+
+pages:
+  stage: deploy
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm test
+    - npm run build
+    # GitLab Pages serves the "public" artifact; replace the source public/ with the build output
+    - rm -rf public
+    - mv dist public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
