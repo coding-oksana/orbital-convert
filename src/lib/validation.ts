@@ -4,7 +4,7 @@ import {
   formatNum,
   parseNum,
   type Keplerian,
-} from './orbital';
+} from './orbital.js';
 
 export const KEPLERIAN_KEYS = ['a', 'e', 'i', 'raan', 'omega', 'nu'] as const;
 export const CARTESIAN_KEYS = ['x', 'y', 'z', 'vx', 'vy', 'vz'] as const;

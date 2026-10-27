@@ -27,3 +27,6 @@ dist-ssr
 cypress/screenshots
 cypress/videos
 cypress/downloads
+
+# npm library build
+dist-lib

@@ -11,6 +11,59 @@ A small web app that converts a satellite orbit between two descriptions:
 
 Edit either panel and the other one updates. Values that don't make physical sense (for example `e ≥ 1`, a position inside Earth or a speed above escape speed) are flagged and are not converted.
 
+## Use as a library
+
+The conversion and validation code is published to npm as `orbital-convert`, with no dependencies and TypeScript types included.
+
+```sh
+npm install orbital-convert
+```
+
+```ts
+import {
+  keplerianToCartesian,
+  cartesianToKeplerian,
+  checkKeplerian,
+} from 'orbital-convert';
+
+// Keplerian elements → state vector (km, km/s)
+const state = keplerianToCartesian({
+  a: 7000, // km
+  e: 0.01,
+  i: 51.6, // degrees
+  raan: 30,
+  omega: 40,
+  nu: 60,
+});
+// { x, y, z, vx, vy, vz, r, v }
+
+// State vector → Keplerian elements
+const elements = cartesianToKeplerian(state);
+// { a, e, i, raan, omega, nu }
+
+// Validate user input given as strings before converting
+const { values, issues } = checkKeplerian({
+  a: '7000',
+  e: '1.2',
+  i: '51.6',
+  raan: '30',
+  omega: '40',
+  nu: '60',
+});
+// values is null when there is an error; issues explains what is wrong
+```
+
+| Export                               | What it does                                                                                    |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `keplerianToCartesian(elements, μ?)` | Keplerian elements → position, velocity, and their magnitudes `r` and `v`                       |
+| `cartesianToKeplerian(state, μ?)`    | Position and velocity → Keplerian elements                                                      |
+| `checkKeplerian(strings)`            | Parses and validates Keplerian input; returns `{ values, issues }`                              |
+| `checkCartesian(strings)`            | Parses and validates a state vector; returns `{ values, issues }`                               |
+| `MU_EARTH`, `EARTH_RADIUS`           | Constants used by default (see [Conventions](#conventions))                                     |
+| `parseNum`, `formatNum`              | Number parsing that accepts Unicode minus signs, and formatting with a fixed number of decimals |
+
+The converters default to Earth's μ. Pass your own as the second argument for another central body. They don't validate their input, so run the `check*` functions first if the values come from users.
+
 ## Conventions
 
 |              |                                                                                                                  |
@@ -44,6 +97,7 @@ Then open http://localhost:5173.
 | -------------------- | --------------------------------------------------------------------------- |
 | `npm run dev`        | Start the dev server                                                        |
 | `npm run build`      | Type-check and build for production into `dist/`                            |
+| `npm run build:lib`  | Build the npm library into `dist-lib/`                                      |
 | `npm run preview`    | Serve the production build                                                  |
 | `npm run typecheck`  | Type-check the app, Vite config and Cypress tests                           |
 | `npm run lint`       | Run ESLint (includes Prettier formatting)                                   |

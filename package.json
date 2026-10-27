@@ -1,10 +1,39 @@
 {
     "name": "orbital-convert",
-    "private": true,
     "version": "1.0.0",
     "description": "Convert satellite orbits between Keplerian elements and a Cartesian state vector.",
+    "keywords": [
+        "orbit",
+        "orbital-elements",
+        "keplerian",
+        "cartesian",
+        "state-vector",
+        "astrodynamics",
+        "satellite"
+    ],
+    "homepage": "https://coding-oksana.github.io/orbital-convert/",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/coding-oksana/orbital-convert.git"
+    },
+    "bugs": "https://github.com/coding-oksana/orbital-convert/issues",
+    "author": "Oksana Popovichenko",
     "license": "MIT",
     "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist-lib/index.d.ts",
+            "default": "./dist-lib/index.js"
+        }
+    },
+    "main": "./dist-lib/index.js",
+    "types": "./dist-lib/index.d.ts",
+    "files": [
+        "dist-lib",
+        "src/lib/*.ts",
+        "!src/lib/*.test.ts"
+    ],
     "engines": {
         "node": ">=22"
     },
@@ -19,11 +48,9 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "test:e2e": "start-server-and-test dev http://localhost:5173 'cypress run'",
-        "cy:open": "cypress open"
-    },
-    "dependencies": {
-        "react": "^19.2.8",
-        "react-dom": "^19.2.8"
+        "cy:open": "cypress open",
+        "build:lib": "rm -rf dist-lib && tsc -p tsconfig.lib.json",
+        "prepublishOnly": "npm test && npm run build:lib"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -40,6 +67,8 @@
         "eslint-plugin-react-refresh": "^0.5.4",
         "globals": "^17.11.0",
         "prettier": "^3.9.9",
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8",
         "start-server-and-test": "^3.0.13",
         "tailwindcss": "^4.3.3",
         "typescript": "~6.0.2",
