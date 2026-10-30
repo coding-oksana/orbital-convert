@@ -1,0 +1,32 @@
+name: Publish to GitHub Packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      # Cypress isn't needed to build or run unit tests; skip its binary download
+      CYPRESS_INSTALL_BINARY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@coding-oksana'
+      - run: npm ci
+      # GitHub Packages only accepts names scoped to the repo owner; npmjs keeps the unscoped name
+      - run: npm pkg set name=@coding-oksana/orbital-convert
+      # prepublishOnly runs the tests and builds the library
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
