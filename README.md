@@ -1,8 +1,9 @@
 # Orbital element converter
 
-[![CI](https://github.com/coding-oksana/orbital-convert/actions/workflows/ci.yml/badge.svg)](https://github.com/coding-oksana/orbital-convert/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/orbital-convert)](https://www.npmjs.com/package/orbital-convert)
 
-**Live app:** https://coding-oksana.github.io/orbital-convert/
+**Live app:** https://coding-oksana.github.io/orbital-convert/  
+**npm package:** https://www.npmjs.com/package/orbital-convert
 
 A small web app that converts a satellite orbit between two descriptions:
 
