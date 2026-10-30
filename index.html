@@ -3,13 +3,63 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Orbital element converter</title>
+    <title>
+      Orbital element converter: Keplerian elements ↔ Cartesian state vector
+    </title>
     <meta
       name="description"
-      content="Convert satellite orbits between Keplerian elements and a Cartesian state vector (position and velocity), with checks for values that don't make physical sense."
+      content="Free online converter between Keplerian orbital elements (a, e, i, RAAN, ω, ν) and a Cartesian ECI state vector (position and velocity), with checks for values that don't make physical sense. Also available as an npm library."
+    />
+    <link
+      rel="canonical"
+      href="https://coding-oksana.github.io/orbital-convert/"
     />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <!-- Link previews (Slack, LinkedIn, X, …) -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://coding-oksana.github.io/orbital-convert/"
+    />
+    <meta
+      property="og:title"
+      content="Orbital element converter: Keplerian ↔ Cartesian"
+    />
+    <meta
+      property="og:description"
+      content="Convert satellite orbits between Keplerian elements and a Cartesian position/velocity state vector, in the browser or with the orbital-convert npm library."
+    />
+    <meta
+      property="og:image"
+      content="https://raw.githubusercontent.com/coding-oksana/orbital-convert/master/docs/screenshot.png"
+    />
+    <meta
+      property="og:image:alt"
+      content="Keplerian elements on the left, the computed Cartesian state vector on the right"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Structured data for search engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Orbital element converter",
+        "url": "https://coding-oksana.github.io/orbital-convert/",
+        "description": "Convert satellite orbits between Keplerian orbital elements and a Cartesian ECI state vector (position and velocity).",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Person", "name": "Oksana Popovichenko" },
+        "sameAs": [
+          "https://github.com/coding-oksana/orbital-convert",
+          "https://www.npmjs.com/package/orbital-convert"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,15 +1,30 @@
 {
     "name": "orbital-convert",
     "version": "1.0.0",
-    "description": "Convert satellite orbits between Keplerian elements and a Cartesian state vector.",
+    "description": "Convert satellite orbits between Keplerian (classical) orbital elements and Cartesian position/velocity state vectors (ECI). Tiny, dependency-free TypeScript, with input validation.",
     "keywords": [
         "orbit",
         "orbital-elements",
+        "keplerian-elements",
         "keplerian",
+        "kepler",
+        "classical-orbital-elements",
         "cartesian",
         "state-vector",
+        "position-velocity",
+        "eci",
+        "coordinate-conversion",
+        "rv2coe",
+        "coe2rv",
+        "orbital-mechanics",
         "astrodynamics",
-        "satellite"
+        "celestial-mechanics",
+        "two-body",
+        "satellite",
+        "spacecraft",
+        "space",
+        "aerospace",
+        "typescript"
     ],
     "homepage": "https://coding-oksana.github.io/orbital-convert/",
     "repository": {

@@ -1,11 +1,15 @@
-# Orbital element converter
+# orbital-convert: Keplerian elements ↔ Cartesian state vector
 
 [![npm](https://img.shields.io/npm/v/orbital-convert)](https://www.npmjs.com/package/orbital-convert)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/orbital-convert)](https://bundlephobia.com/package/orbital-convert)
+[![license](https://img.shields.io/npm/l/orbital-convert)](LICENSE)
+
+Convert satellite orbits between **Keplerian (classical) orbital elements** and a **Cartesian position and velocity state vector** in the Earth-centred inertial (ECI) frame. Available as a dependency-free TypeScript library (the classic `coe2rv` / `rv2coe` conversions) and as an online converter.
 
 **Live app:** https://coding-oksana.github.io/orbital-convert/  
 **npm package:** https://www.npmjs.com/package/orbital-convert
 
-A small web app that converts a satellite orbit between two descriptions:
+The web app converts an orbit between two descriptions:
 
 - **Keplerian elements**: semi-major axis `a`, eccentricity `e`, inclination `i`, right ascension of the ascending node `Ω`, argument of periapsis `ω` and true anomaly `ν`.
 - **Cartesian state vector**: position `x, y, z` and velocity `vx, vy, vz`.
