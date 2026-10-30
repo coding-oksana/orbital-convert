@@ -12,6 +12,8 @@ A small web app that converts a satellite orbit between two descriptions:
 
 Edit either panel and the other one updates. Values that don't make physical sense (for example `e ≥ 1`, a position inside Earth or a speed above escape speed) are flagged and are not converted.
 
+[![Screenshot of the app: Keplerian elements on the left, the computed Cartesian state vector on the right](https://raw.githubusercontent.com/coding-oksana/orbital-convert/master/docs/screenshot.png)](https://coding-oksana.github.io/orbital-convert/)
+
 ## Use as a library
 
 The conversion and validation code is published to npm as `orbital-convert`, with no dependencies and TypeScript types included.
